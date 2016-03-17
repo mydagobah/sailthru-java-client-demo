@@ -1,25 +1,43 @@
 package com.sail;
 
-import java.io.IOException;
-import java.util.*;
 import com.sailthru.client.SailthruClient;
 import com.sailthru.client.exceptions.ApiException;
 import com.sailthru.client.handler.response.JsonResponse;
 import com.sailthru.client.params.Content;
+import com.sailthru.client.params.User;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class App {
-    String apiKey = "replace-with-your-api-key";
-    String apiSec = "replace-with-your-api-sec";
-    SailthruClient client = new SailthruClient(apiKey, apiSec);
+    private static final String apiKey = "replace-with-your-api-key";
+    private static final String apiSec = "replace-with-your-api-key";
+    private static final String apiUrl = "http://api.sailthru.com"; // specify for internal testing
+    private static SailthruClient client;
 
     public static void main( String[] args ) {
+        client = new SailthruClient(apiKey, apiSec, apiUrl);
         App demo = new App();
-        demo.testContent();
+        demo.getUser();
     }
 
-    // test email GET
+    // GET /user
+    public void getUser() {
+        User user = new User("foo@bar.com");
+        user.setKey("email");
+        try {
+            JsonResponse response = client.getUser(user);
+            System.out.println("Response:");
+            System.out.println(response.toString());
+        } catch (IOException e) {
+            // handle exception
+        }
+    }
+
+
+    // GET /email
     public void testGetEmail() {
-	try {
+    	try {
             JsonResponse response = client.getEmail("wzhang@sailthru.com");
             printResponse(response);
         } catch (ApiException e) {
@@ -29,7 +47,7 @@ public class App {
         }
     }
 
-    // test content POST
+    // POST /content
     public void testContent() {
         Content content = new Content();
         content = content.setUrl("http://www.sailthru.com/content/test/002")
@@ -51,7 +69,7 @@ public class App {
     	Map<String, Object> res = response.getResponse();
 
         for(String k : res.keySet()) {
-        	System.out.println(k + " => " + res.get(k));
+            System.out.println(k + " => " + res.get(k));
         }
     }
 }
